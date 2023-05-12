@@ -20,10 +20,7 @@ class AlignedResize(object):
         if img_scale is None:
             self.img_scale = None
         else:
-            if isinstance(img_scale, list):
-                self.img_scale = img_scale
-            else:
-                self.img_scale = [img_scale]
+            self.img_scale = img_scale if isinstance(img_scale, list) else [img_scale]
             assert mmcv.is_list_of(self.img_scale, tuple)
 
         if ratio_range is not None:
@@ -152,7 +149,7 @@ class AlignedResize(object):
     def _align(self, img, size_divisor, interpolation=None):
         align_h = int(np.ceil(img.shape[0] / size_divisor)) * size_divisor
         align_w = int(np.ceil(img.shape[1] / size_divisor)) * size_divisor
-        if interpolation == None:
+        if interpolation is None:
             img = mmcv.imresize(img, (align_w, align_h))
         else:
             img = mmcv.imresize(img, (align_w, align_h), interpolation=interpolation)
@@ -176,9 +173,10 @@ class AlignedResize(object):
                 results['img'], results['scale'], return_scale=True)
 
             h, w = img.shape[:2]
-            assert int(np.ceil(h / self.size_divisor)) * self.size_divisor == h and \
-                   int(np.ceil(w / self.size_divisor)) * self.size_divisor == w, \
-                   "img size not align. h:{} w:{}".format(h,w)
+            assert (
+                int(np.ceil(h / self.size_divisor)) * self.size_divisor == h
+                and int(np.ceil(w / self.size_divisor)) * self.size_divisor == w
+            ), f"img size not align. h:{h} w:{w}"
         scale_factor = np.array([w_scale, h_scale, w_scale, h_scale],
                                 dtype=np.float32)
         results['img'] = img
@@ -198,9 +196,11 @@ class AlignedResize(object):
                 gt_seg = mmcv.imresize(
                     results[key], results['scale'], interpolation='nearest')
                 h, w = gt_seg.shape[:2]
-                assert int(np.ceil(h / self.size_divisor)) * self.size_divisor == h and \
-                       int(np.ceil(w / self.size_divisor)) * self.size_divisor == w, \
-                    "gt_seg size not align. h:{} w:{}".format(h, w)
+                assert (
+                    int(np.ceil(h / self.size_divisor)) * self.size_divisor == h
+                    and int(np.ceil(w / self.size_divisor)) * self.size_divisor
+                    == w
+                ), f"gt_seg size not align. h:{h} w:{w}"
             results[key] = gt_seg
 
     def __call__(self, results):
@@ -270,10 +270,7 @@ class Resize(object):
         if img_scale is None:
             self.img_scale = None
         else:
-            if isinstance(img_scale, list):
-                self.img_scale = img_scale
-            else:
-                self.img_scale = [img_scale]
+            self.img_scale = img_scale if isinstance(img_scale, list) else [img_scale]
             assert mmcv.is_list_of(self.img_scale, tuple)
 
         if ratio_range is not None:
@@ -493,7 +490,7 @@ class RandomFlip(object):
         """
 
         if 'flip' not in results:
-            flip = True if np.random.rand() < self.prob else False
+            flip = np.random.rand() < self.prob
             results['flip'] = flip
         if 'flip_direction' not in results:
             results['flip_direction'] = self.direction
@@ -510,7 +507,7 @@ class RandomFlip(object):
         return results
 
     def __repr__(self):
-        return self.__class__.__name__ + f'(prob={self.prob})'
+        return f'{self.__class__.__name__}(prob={self.prob})'
 
 
 @PIPELINES.register_module()
@@ -638,8 +635,8 @@ class Rerange(object):
     """
 
     def __init__(self, min_value=0, max_value=255):
-        assert isinstance(min_value, float) or isinstance(min_value, int)
-        assert isinstance(max_value, float) or isinstance(max_value, int)
+        assert isinstance(min_value, (float, int))
+        assert isinstance(max_value, (float, int))
         assert min_value < max_value
         self.min_value = min_value
         self.max_value = max_value
@@ -787,7 +784,7 @@ class RandomCrop(object):
         return results
 
     def __repr__(self):
-        return self.__class__.__name__ + f'(crop_size={self.crop_size})'
+        return f'{self.__class__.__name__}(crop_size={self.crop_size})'
 
 @PIPELINES.register_module()
 class CenterCrop(object):
@@ -845,7 +842,7 @@ class CenterCrop(object):
         return results
 
     def __repr__(self):
-        return self.__class__.__name__ + f'(crop_size={self.crop_size})'
+        return f'{self.__class__.__name__}(crop_size={self.crop_size})'
 
 
 @PIPELINES.register_module()
@@ -898,7 +895,7 @@ class RandomRotate(object):
             dict: Rotated results.
         """
 
-        rotate = True if np.random.rand() < self.prob else False
+        rotate = np.random.rand() < self.prob
         degree = np.random.uniform(min(*self.degree), max(*self.degree))
         if rotate:
             # rotate image
@@ -996,7 +993,7 @@ class AdjustGamma(object):
     """
 
     def __init__(self, gamma=1.0):
-        assert isinstance(gamma, float) or isinstance(gamma, int)
+        assert isinstance(gamma, (float, int))
         assert gamma > 0
         self.gamma = gamma
         inv_gamma = 1.0 / gamma
@@ -1019,7 +1016,7 @@ class AdjustGamma(object):
         return results
 
     def __repr__(self):
-        return self.__class__.__name__ + f'(gamma={self.gamma})'
+        return f'{self.__class__.__name__}(gamma={self.gamma})'
 
 @PIPELINES.register_module()
 class MaillaryHack(object):
@@ -1029,7 +1026,7 @@ class MaillaryHack(object):
         self.map = [[13, 24, 41], [2, 15], [17], [6], [3], [45, 47], [48], [50], [30], [29],
                     [27], [19], [20, 21, 22], [55], [61], [54], [58], [57], [52]]
 
-        self.others = [i for i in range(66)]
+        self.others = list(range(66))
         for i in self.map:
             for j in i:
                 if j in self.others:
@@ -1089,7 +1086,7 @@ class SegRescale(object):
         return results
 
     def __repr__(self):
-        return self.__class__.__name__ + f'(scale_factor={self.scale_factor})'
+        return f'{self.__class__.__name__}(scale_factor={self.scale_factor})'
 
 
 @PIPELINES.register_module()

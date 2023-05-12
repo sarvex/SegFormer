@@ -150,10 +150,7 @@ class EncHead(BaseDecodeHead):
 
     def forward_test(self, inputs, img_metas, test_cfg):
         """Forward function for testing, ignore se_loss."""
-        if self.use_se_loss:
-            return self.forward(inputs)[0]
-        else:
-            return self.forward(inputs)
+        return self.forward(inputs)[0] if self.use_se_loss else self.forward(inputs)
 
     @staticmethod
     def _convert_to_onehot_labels(seg_label, num_classes):
@@ -178,8 +175,8 @@ class EncHead(BaseDecodeHead):
     def losses(self, seg_logit, seg_label):
         """Compute segmentation and semantic encoding loss."""
         seg_logit, se_seg_logit = seg_logit
-        loss = dict()
-        loss.update(super(EncHead, self).losses(seg_logit, seg_label))
+        loss = {}
+        loss |= super(EncHead, self).losses(seg_logit, seg_label)
         se_loss = self.loss_se_decode(
             se_seg_logit,
             self._convert_to_onehot_labels(seg_label, self.num_classes))

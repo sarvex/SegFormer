@@ -10,9 +10,7 @@ find_unused_parameters = True
 model = dict(
     type='EncoderDecoder',
     pretrained='pretrained/mit_b0.pth',
-    backbone=dict(
-        type='mit_b0',
-        style='pytorch'),
+    backbone=dict(type='mit_b0', style='pytorch'),
     decode_head=dict(
         type='SegFormerHead',
         in_channels=[32, 64, 160, 256],
@@ -24,10 +22,13 @@ model = dict(
         norm_cfg=norm_cfg,
         align_corners=False,
         decoder_params=dict(embed_dim=256),
-        loss_decode=dict(type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0)),
-    # model training and testing settings
-    train_cfg=dict(),
-    test_cfg=dict(mode='whole'))
+        loss_decode=dict(
+            type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0
+        ),
+    ),
+    train_cfg={},
+    test_cfg=dict(mode='whole'),
+)
 
 # dataset settings
 dataset_type = 'CityscapesDataset'

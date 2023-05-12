@@ -16,8 +16,7 @@ from mmseg.core import DistEvalHook, EvalHook
 class ExampleDataset(Dataset):
 
     def __getitem__(self, idx):
-        results = dict(img=torch.tensor([1]), img_metas=dict())
-        return results
+        return dict(img=torch.tensor([1]), img_metas={})
 
     def __len__(self):
         return 1
@@ -113,8 +112,7 @@ def test_epoch_eval_hook():
 
 
 def multi_gpu_test(model, data_loader, tmpdir=None, gpu_collect=False):
-    results = single_gpu_test(model, data_loader)
-    return results
+    return single_gpu_test(model, data_loader)
 
 
 @patch('mmseg.apis.multi_gpu_test', multi_gpu_test)

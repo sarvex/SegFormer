@@ -19,9 +19,7 @@ def get_confusion_matrix(pred_label, label, num_classes, ignore_index):
     n = num_classes
     inds = n * label + pred_label
 
-    mat = np.bincount(inds, minlength=n**2).reshape(n, n)
-
-    return mat
+    return np.bincount(inds, minlength=n**2).reshape(n, n)
 
 
 # This func is deprecated since it's not memory efficient

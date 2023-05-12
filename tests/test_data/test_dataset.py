@@ -288,4 +288,4 @@ def test_custom_dataset_custom_palette():
         classes=('bus', 'car'),
         palette=[[100, 100, 100], [200, 200, 200]],
         test_mode=True)
-    assert tuple(dataset.PALETTE) == tuple([[100, 100, 100], [200, 200, 200]])
+    assert tuple(dataset.PALETTE) == ([100, 100, 100], [200, 200, 200])

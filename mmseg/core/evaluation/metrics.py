@@ -205,7 +205,7 @@ def eval_metrics(results,
         metrics = [metrics]
     allowed_metrics = ['mIoU', 'mDice']
     if not set(metrics).issubset(set(allowed_metrics)):
-        raise KeyError('metrics {} is not supported'.format(metrics))
+        raise KeyError(f'metrics {metrics} is not supported')
     total_area_intersect, total_area_union, total_area_pred_label, \
         total_area_label = total_intersect_and_union(results, gt_seg_maps,
                                                      num_classes, ignore_index,
@@ -215,13 +215,13 @@ def eval_metrics(results,
     acc = total_area_intersect / total_area_label
     ret_metrics = [all_acc, acc]
     for metric in metrics:
-        if metric == 'mIoU':
-            iou = total_area_intersect / total_area_union
-            ret_metrics.append(iou)
-        elif metric == 'mDice':
+        if metric == 'mDice':
             dice = 2 * total_area_intersect / (
                 total_area_pred_label + total_area_label)
             ret_metrics.append(dice)
+        elif metric == 'mIoU':
+            iou = total_area_intersect / total_area_union
+            ret_metrics.append(iou)
     if nan_to_num is not None:
         ret_metrics = [
             np.nan_to_num(metric, nan=nan_to_num) for metric in ret_metrics

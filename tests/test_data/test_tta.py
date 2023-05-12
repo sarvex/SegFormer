@@ -47,17 +47,16 @@ def test_multi_scale_flip_aug():
     )
     tta_module = build_from_cfg(tta_transform, PIPELINES)
 
-    results = dict()
     # (288, 512, 3)
     img = mmcv.imread(
         osp.join(osp.dirname(__file__), '../data/color.jpg'), 'color')
-    results['img'] = img
-    results['img_shape'] = img.shape
-    results['ori_shape'] = img.shape
-    # Set initial values for default meta_keys
-    results['pad_shape'] = img.shape
-    results['scale_factor'] = 1.0
-
+    results = {
+        'img': img,
+        'img_shape': img.shape,
+        'ori_shape': img.shape,
+        'pad_shape': img.shape,
+        'scale_factor': 1.0,
+    }
     tta_results = tta_module(results.copy())
     assert tta_results['scale'] == [(256, 256), (512, 512), (1024, 1024)]
     assert tta_results['flip'] == [False, False, False]

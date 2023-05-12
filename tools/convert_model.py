@@ -17,9 +17,7 @@ def parse_args():
     parser.add_argument('oldmodel', help='train config file path')
     parser.add_argument('newmodel', help='train config file path')
 
-    args = parser.parse_args()
-
-    return args
+    return parser.parse_args()
 
 
 def main():
@@ -33,7 +31,7 @@ def main():
     for old_key in old_dict.keys():
         if 'hybrid_embed' in old_key:
             new_key = old_key.replace('hybrid_embed', 'linear')
-            print("{} -> {}".format(old_key, new_key))
+            print(f"{old_key} -> {new_key}")
         elif 'conv_seg' in old_key:
             new_key = old_key.replace('conv_seg', 'linear_pred')
             ncls = old_dict[old_key].shape[0]
@@ -43,7 +41,7 @@ def main():
             else:
                 rand_weight_conv = torch.randn(ncls, 128, 1, 1)
                 new_dict[old_key] = rand_weight_conv
-            print("{} -> {}".format(old_key, new_key))
+            print(f"{old_key} -> {new_key}")
         else:
             new_key = old_key
 

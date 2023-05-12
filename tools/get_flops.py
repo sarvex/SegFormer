@@ -16,8 +16,7 @@ def parse_args():
         nargs='+',
         default=[2048, 1024],
         help='input image size')
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 def sra_flops(h, w, r, dim, num_heads):
     dim_h = dim / num_heads
@@ -96,8 +95,8 @@ def main():
         model.forward = model.forward_dummy
     else:
         raise NotImplementedError(
-            'FLOPs counter is currently not currently supported with {}'.
-            format(model.__class__.__name__))
+            f'FLOPs counter is currently not currently supported with {model.__class__.__name__}'
+        )
 
     # from IPython import embed; embed()
     if hasattr(model.backbone, 'block1'):

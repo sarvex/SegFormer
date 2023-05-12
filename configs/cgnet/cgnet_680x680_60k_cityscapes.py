@@ -5,7 +5,7 @@ _base_ = [
 
 # optimizer
 optimizer = dict(type='Adam', lr=0.001, eps=1e-08, weight_decay=0.0005)
-optimizer_config = dict()
+optimizer_config = {}
 # learning policy
 lr_config = dict(policy='poly', power=0.9, min_lr=1e-4, by_epoch=False)
 # runtime settings

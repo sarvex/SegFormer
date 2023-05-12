@@ -11,9 +11,7 @@ find_unused_parameters = True
 model = dict(
     type='EncoderDecoder',
     pretrained='pretrained/mit_b2.pth',
-    backbone=dict(
-        type='mit_b2',
-        style='pytorch'),
+    backbone=dict(type='mit_b2', style='pytorch'),
     decode_head=dict(
         type='SegFormerHead',
         # type='MLPHead',
@@ -26,10 +24,13 @@ model = dict(
         norm_cfg=norm_cfg,
         align_corners=False,
         decoder_params=dict(embed_dim=768),
-        loss_decode=dict(type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0)),
-    # model training and testing settings
-    train_cfg=dict(),
-    test_cfg=dict(mode='whole'))
+        loss_decode=dict(
+            type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0
+        ),
+    ),
+    train_cfg={},
+    test_cfg=dict(mode='whole'),
+)
 
 # optimizer
 optimizer = dict(_delete_=True, type='AdamW', lr=0.00006, betas=(0.9, 0.999), weight_decay=0.01,

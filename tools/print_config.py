@@ -8,9 +8,7 @@ def parse_args():
     parser.add_argument('config', help='config file path')
     parser.add_argument(
         '--options', nargs='+', action=DictAction, help='arguments in dict')
-    args = parser.parse_args()
-
-    return args
+    return parser.parse_args()
 
 
 def main():

@@ -1,6 +1,6 @@
 # optimizer
 optimizer = dict(type='AdamW', lr=0.0002, weight_decay=0.0001)
-optimizer_config = dict()
+optimizer_config = {}
 # learning policy
 lr_config = dict(policy='poly', power=0.9, min_lr=0.0, by_epoch=False)
 # runtime settings

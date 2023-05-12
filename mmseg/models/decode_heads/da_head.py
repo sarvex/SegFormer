@@ -129,15 +129,13 @@ class DAHead(BaseDecodeHead):
         """PAM feature classification."""
         if self.dropout is not None:
             feat = self.dropout(feat)
-        output = self.pam_conv_seg(feat)
-        return output
+        return self.pam_conv_seg(feat)
 
     def cam_cls_seg(self, feat):
         """CAM feature classification."""
         if self.dropout is not None:
             feat = self.dropout(feat)
-        output = self.cam_conv_seg(feat)
-        return output
+        return self.cam_conv_seg(feat)
 
     def forward(self, inputs):
         """Forward function."""
@@ -164,11 +162,10 @@ class DAHead(BaseDecodeHead):
     def losses(self, seg_logit, seg_label):
         """Compute ``pam_cam``, ``pam``, ``cam`` loss."""
         pam_cam_seg_logit, pam_seg_logit, cam_seg_logit = seg_logit
-        loss = dict()
-        loss.update(
-            add_prefix(
-                super(DAHead, self).losses(pam_cam_seg_logit, seg_label),
-                'pam_cam'))
+        loss = {}
+        loss |= add_prefix(
+            super(DAHead, self).losses(pam_cam_seg_logit, seg_label), 'pam_cam'
+        )
         loss.update(
             add_prefix(
                 super(DAHead, self).losses(pam_seg_logit, seg_label), 'pam'))

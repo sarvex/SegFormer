@@ -59,12 +59,11 @@ def _demo_mm_inputs(input_shape, num_classes):
         'scale_factor': 1.0,
         'flip': False,
     } for _ in range(N)]
-    mm_inputs = {
+    return {
         'imgs': torch.FloatTensor(imgs).requires_grad_(True),
         'img_metas': img_metas,
-        'gt_semantic_seg': torch.LongTensor(segs)
+        'gt_semantic_seg': torch.LongTensor(segs),
     }
-    return mm_inputs
 
 
 def pytorch2onnx(model,
@@ -160,8 +159,7 @@ def parse_args():
         nargs='+',
         default=[256, 256],
         help='input image size')
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 if __name__ == '__main__':

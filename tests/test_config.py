@@ -29,16 +29,15 @@ def test_config_build_segmentor():
     config_dpath = _get_config_directory()
     print('Found config_dpath = {!r}'.format(config_dpath))
 
-    config_fpaths = []
-    # one config each sub folder
-    for sub_folder in os.listdir(config_dpath):
-        if isdir(sub_folder):
-            config_fpaths.append(
-                list(glob.glob(join(config_dpath, sub_folder, '*.py')))[0])
+    config_fpaths = [
+        list(glob.glob(join(config_dpath, sub_folder, '*.py')))[0]
+        for sub_folder in os.listdir(config_dpath)
+        if isdir(sub_folder)
+    ]
     config_fpaths = [p for p in config_fpaths if p.find('_base_') == -1]
     config_names = [relpath(p, config_dpath) for p in config_fpaths]
 
-    print('Using {} config files'.format(len(config_names)))
+    print(f'Using {len(config_names)} config files')
 
     for config_fname in config_names:
         config_fpath = join(config_dpath, config_fname)
@@ -51,7 +50,7 @@ def test_config_build_segmentor():
         if 'pretrained' in config_mod.model:
             config_mod.model['pretrained'] = None
 
-        print('building {}'.format(config_fname))
+        print(f'building {config_fname}')
         segmentor = build_segmentor(config_mod.model)
         assert segmentor is not None
 
@@ -77,7 +76,7 @@ def test_config_data_pipeline():
     config_fpaths = [p for p in config_fpaths if p.find('_base_') == -1]
     config_names = [relpath(p, config_dpath) for p in config_fpaths]
 
-    print('Using {} config files'.format(len(config_names)))
+    print(f'Using {len(config_names)} config files')
 
     for config_fname in config_names:
         config_fpath = join(config_dpath, config_fname)

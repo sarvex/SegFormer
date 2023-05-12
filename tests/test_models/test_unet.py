@@ -10,11 +10,10 @@ from mmseg.models.backbones.unet import (BasicConvBlock, DeconvModule,
 
 def check_norm_state(modules, train_state):
     """Check if norm layer is in correct train state."""
-    for mod in modules:
-        if isinstance(mod, _BatchNorm):
-            if mod.training != train_state:
-                return False
-    return True
+    return not any(
+        isinstance(mod, _BatchNorm) and mod.training != train_state
+        for mod in modules
+    )
 
 
 def test_unet_basic_conv_block():

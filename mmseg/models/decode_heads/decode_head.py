@@ -81,18 +81,12 @@ class BaseDecodeHead(nn.Module, metaclass=ABCMeta):
             self.sampler = None
 
         self.conv_seg = nn.Conv2d(channels, num_classes, kernel_size=1)
-        if dropout_ratio > 0:
-            self.dropout = nn.Dropout2d(dropout_ratio)
-        else:
-            self.dropout = None
+        self.dropout = nn.Dropout2d(dropout_ratio) if dropout_ratio > 0 else None
         self.fp16_enabled = False
 
     def extra_repr(self):
         """Extra repr."""
-        s = f'input_transform={self.input_transform}, ' \
-            f'ignore_index={self.ignore_index}, ' \
-            f'align_corners={self.align_corners}'
-        return s
+        return f'input_transform={self.input_transform}, ignore_index={self.ignore_index}, align_corners={self.align_corners}'
 
     def _init_inputs(self, in_channels, in_index, input_transform):
         """Check and initialize input transforms.
@@ -210,13 +204,11 @@ class BaseDecodeHead(nn.Module, metaclass=ABCMeta):
         """Classify each pixel."""
         if self.dropout is not None:
             feat = self.dropout(feat)
-        output = self.conv_seg(feat)
-        return output
+        return self.conv_seg(feat)
 
     @force_fp32(apply_to=('seg_logit', ))
     def losses(self, seg_logit, seg_label):
         """Compute segmentation loss."""
-        loss = dict()
         seg_logit = resize(
             input=seg_logit,
             size=seg_label.shape[2:],
@@ -227,10 +219,13 @@ class BaseDecodeHead(nn.Module, metaclass=ABCMeta):
         else:
             seg_weight = None
         seg_label = seg_label.squeeze(1)
-        loss['loss_seg'] = self.loss_decode(
-            seg_logit,
-            seg_label,
-            weight=seg_weight,
-            ignore_index=self.ignore_index)
+        loss = {
+            'loss_seg': self.loss_decode(
+                seg_logit,
+                seg_label,
+                weight=seg_weight,
+                ignore_index=self.ignore_index,
+            )
+        }
         loss['acc_seg'] = accuracy(seg_logit, seg_label)
         return loss

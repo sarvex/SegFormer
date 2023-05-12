@@ -13,8 +13,7 @@ def digit_version(version_str):
             digit_version.append(int(x))
         elif x.find('rc') != -1:
             patch_version = x.split('rc')
-            digit_version.append(int(patch_version[0]) - 1)
-            digit_version.append(int(patch_version[1]))
+            digit_version.extend((int(patch_version[0]) - 1, int(patch_version[1])))
     return digit_version
 
 

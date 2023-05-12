@@ -24,13 +24,12 @@ def build(cfg, registry, default_args=None):
         nn.Module: A built nn module.
     """
 
-    if isinstance(cfg, list):
-        modules = [
-            build_from_cfg(cfg_, registry, default_args) for cfg_ in cfg
-        ]
-        return nn.Sequential(*modules)
-    else:
+    if not isinstance(cfg, list):
         return build_from_cfg(cfg, registry, default_args)
+    modules = [
+        build_from_cfg(cfg_, registry, default_args) for cfg_ in cfg
+    ]
+    return nn.Sequential(*modules)
 
 
 def build_backbone(cfg):

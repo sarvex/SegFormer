@@ -32,8 +32,7 @@ class FCNHead(BaseDecodeHead):
         if num_convs == 0:
             assert self.in_channels == self.channels
 
-        convs = []
-        convs.append(
+        convs = [
             ConvModule(
                 self.in_channels,
                 self.channels,
@@ -41,21 +40,22 @@ class FCNHead(BaseDecodeHead):
                 padding=kernel_size // 2,
                 conv_cfg=self.conv_cfg,
                 norm_cfg=self.norm_cfg,
-                act_cfg=self.act_cfg))
-        for i in range(num_convs - 1):
-            convs.append(
-                ConvModule(
-                    self.channels,
-                    self.channels,
-                    kernel_size=kernel_size,
-                    padding=kernel_size // 2,
-                    conv_cfg=self.conv_cfg,
-                    norm_cfg=self.norm_cfg,
-                    act_cfg=self.act_cfg))
-        if num_convs == 0:
-            self.convs = nn.Identity()
-        else:
-            self.convs = nn.Sequential(*convs)
+                act_cfg=self.act_cfg,
+            )
+        ]
+        convs.extend(
+            ConvModule(
+                self.channels,
+                self.channels,
+                kernel_size=kernel_size,
+                padding=kernel_size // 2,
+                conv_cfg=self.conv_cfg,
+                norm_cfg=self.norm_cfg,
+                act_cfg=self.act_cfg,
+            )
+            for _ in range(num_convs - 1)
+        )
+        self.convs = nn.Identity() if num_convs == 0 else nn.Sequential(*convs)
         if self.concat_input:
             self.conv_cat = ConvModule(
                 self.in_channels + self.channels,

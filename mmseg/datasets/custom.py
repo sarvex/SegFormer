@@ -275,11 +275,7 @@ class CustomDataset(Dataset):
             # used for changing pixel labels in load_annotations.
             self.label_map = {}
             for i, c in enumerate(self.CLASSES):
-                if c not in class_names:
-                    self.label_map[i] = -1
-                else:
-                    self.label_map[i] = classes.index(c)
-
+                self.label_map[i] = -1 if c not in class_names else classes.index(c)
         palette = self.get_palette_for_custom_classes(class_names, palette)
 
         return class_names, palette
@@ -287,12 +283,13 @@ class CustomDataset(Dataset):
     def get_palette_for_custom_classes(self, class_names, palette=None):
 
         if self.label_map is not None:
-            # return subset of palette
-            palette = []
-            for old_id, new_id in sorted(
-                    self.label_map.items(), key=lambda x: x[1]):
-                if new_id != -1:
-                    palette.append(self.PALETTE[old_id])
+            palette = [
+                self.PALETTE[old_id]
+                for old_id, new_id in sorted(
+                    self.label_map.items(), key=lambda x: x[1]
+                )
+                if new_id != -1
+            ]
             palette = type(self.PALETTE)(palette)
 
         elif palette is None:
@@ -326,8 +323,7 @@ class CustomDataset(Dataset):
             metric = [metric]
         allowed_metrics = ['mIoU', 'mDice']
         if not set(metric).issubset(set(allowed_metrics)):
-            raise KeyError('metric {} is not supported'.format(metric))
-        eval_results = {}
+            raise KeyError(f'metric {metric} is not supported')
         gt_seg_maps = self.get_gt_seg_maps(efficient_test)
         if self.CLASSES is None:
             num_classes = len(
@@ -350,13 +346,15 @@ class CustomDataset(Dataset):
         ret_metrics_round = [
             np.round(ret_metric * 100, 2) for ret_metric in ret_metrics
         ]
-        for i in range(num_classes):
-            class_table_data.append([class_names[i]] +
-                                    [m[i] for m in ret_metrics_round[2:]] +
-                                    [ret_metrics_round[1][i]])
-        summary_table_data = [['Scope'] +
-                              ['m' + head
-                               for head in class_table_data[0][1:]] + ['aAcc']]
+        class_table_data.extend(
+            [class_names[i]]
+            + [m[i] for m in ret_metrics_round[2:]]
+            + [ret_metrics_round[1][i]]
+            for i in range(num_classes)
+        )
+        summary_table_data = [
+            ['Scope'] + [f'm{head}' for head in class_table_data[0][1:]] + ['aAcc']
+        ]
         ret_metrics_mean = [
             np.round(np.nanmean(ret_metric) * 100, 2)
             for ret_metric in ret_metrics
@@ -371,9 +369,10 @@ class CustomDataset(Dataset):
         table = AsciiTable(summary_table_data)
         print_log('\n' + table.table, logger=logger)
 
-        for i in range(1, len(summary_table_data[0])):
-            eval_results[summary_table_data[0]
-                         [i]] = summary_table_data[1][i] / 100.0
+        eval_results = {
+            summary_table_data[0][i]: summary_table_data[1][i] / 100.0
+            for i in range(1, len(summary_table_data[0]))
+        }
         if mmcv.is_list_of(results, str):
             for file_name in results:
                 os.remove(file_name)

@@ -16,8 +16,7 @@ def parse_args():
     # parser.add_argument('checkpoint', help='checkpoint file')
     parser.add_argument(
         '--log-interval', type=int, default=50, help='interval of logging')
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def main():

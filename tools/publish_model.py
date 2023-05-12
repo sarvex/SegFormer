@@ -9,8 +9,7 @@ def parse_args():
         description='Process a checkpoint to be published')
     parser.add_argument('in_file', help='input checkpoint filename')
     parser.add_argument('out_file', help='output checkpoint filename')
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def process_checkpoint(in_file, out_file):
@@ -22,7 +21,7 @@ def process_checkpoint(in_file, out_file):
     # add the code here.
     torch.save(checkpoint, out_file)
     sha = subprocess.check_output(['sha256sum', out_file]).decode()
-    final_file = out_file.rstrip('.pth') + '-{}.pth'.format(sha[:8])
+    final_file = out_file.rstrip('.pth') + f'-{sha[:8]}.pth'
     subprocess.Popen(['mv', out_file, final_file])
 
 

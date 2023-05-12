@@ -16,16 +16,12 @@ from mmseg.models.utils import ResLayer
 
 def is_block(modules):
     """Check if is ResNet building block."""
-    if isinstance(modules, (BasicBlock, Bottleneck, BottleneckX)):
-        return True
-    return False
+    return isinstance(modules, (BasicBlock, Bottleneck, BottleneckX))
 
 
 def is_norm(modules):
     """Check if is one of the norms."""
-    if isinstance(modules, (GroupNorm, _BatchNorm)):
-        return True
-    return False
+    return isinstance(modules, (GroupNorm, _BatchNorm))
 
 
 def all_zeros(modules):
@@ -43,11 +39,10 @@ def all_zeros(modules):
 
 def check_norm_state(modules, train_state):
     """Check if norm layer is in correct train state."""
-    for mod in modules:
-        if isinstance(mod, _BatchNorm):
-            if mod.training != train_state:
-                return False
-    return True
+    return not any(
+        isinstance(mod, _BatchNorm) and mod.training != train_state
+        for mod in modules
+    )
 
 
 def test_resnet_basic_block():
@@ -369,7 +364,7 @@ def test_resnet_backbone():
         for param in layer.parameters():
             assert param.requires_grad is False
     for i in range(1, frozen_stages + 1):
-        layer = getattr(model, 'layer{}'.format(i))
+        layer = getattr(model, f'layer{i}')
         for mod in layer.modules():
             if isinstance(mod, _BatchNorm):
                 assert mod.training is False
@@ -385,7 +380,7 @@ def test_resnet_backbone():
     for param in model.stem.parameters():
         assert param.requires_grad is False
     for i in range(1, frozen_stages + 1):
-        layer = getattr(model, 'layer{}'.format(i))
+        layer = getattr(model, f'layer{i}')
         for mod in layer.modules():
             if isinstance(mod, _BatchNorm):
                 assert mod.training is False
